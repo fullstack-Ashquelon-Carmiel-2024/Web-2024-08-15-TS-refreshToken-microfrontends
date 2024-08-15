@@ -1,0 +1,239 @@
+1. prerequisites:
+   JS
+   npm
+   React
+
+2. Just to see how TS compiles into plain JS, use TS playground
+
+https://www.typescriptlang.org/play
+
+Go to see there "Examples" too
+
+3. Install per project:
+
+> npm i typescript --save-dev 
+
+or globally:
+
+> npm i -g typescript 
+
+or may be install node-ts too
+
+> npm i -g typescript ts-node 
+
+4. Now we get tsc command 
+
+tsc - shortcut of TypeScript Compiler
+
+> tsc -v
+
+> tsc -help
+
+5. Create file like-js.ts:
+
+console.log("start TypeScript")
+console.log(Math.round(5.45678))
+
+All the commands are like in JS. 
+
+Compile it:
+
+> tsc like-js.ts
+
+Now we get like-js.js - and it looks exactly as like-js.ts. 
+
+6. Create file now-ts.ts with the code that not exists in js:
+
+let pi:number = 3.14159
+console.log(`PI rounded to 2 digits = ${Math.round(pi*100)/100}`)
+
+Compile it and see that now-ts.js contains JS only.
+
+7. Create now files compare.js and compare.ts, each one will contain 
+only:
+
+console.log(firstName)
+
+See that at compare.js you will see the problem (even not the error!) 
+only in the time of run
+and at compare.ts you will see the error immediately without running 
+or even compiling
+
+8. We'll use now the sample API https://jsonplaceholder.typicode.com/
+
+To get all the todos:
+https://jsonplaceholder.typicode.com/todos
+
+To get one todo by id of todo (not user): 
+https://jsonplaceholder.typicode.com/todos/5
+
+9. To start making sample TS project:
+
+> mkdir fetch-with-ts
+> cd fetch-with-ts
+> npm init -y
+
+Now we get package.json, it works with TS too.
+
+> npm i axios
+
+10. index.ts:
+
+import axios from 'axios';
+
+const url = `https://jsonplaceholder.typicode.com/todos/5`;
+
+axios.get(url).then(response => {
+    console.log(response.data);
+})
+
+11. compile and run:
+
+> tsc index.ts
+
+we're getting several ts errors, but js is created 
+
+> node index.js
+
+The app runs and shows the fetched data
+
+12. To perform the both actions together we can use ts-node
+    (compiles and runs):
+(> npm i -g ts-node)
+> ts-node index.ts
+
+13. index.ts:
+
+import axios from 'axios';
+
+const url = `https://jsonplaceholder.typicode.com/todos/5`;
+
+axios.get(url).then(response => {
+    const todo = response.data;
+
+    const id = todo.ID;
+    const title = todo.Title;
+    const finished = todo.finished;
+    
+    console.log(`
+        TODO ID: ${id}
+        WHAT TO DO? ${title}
+        IS IT FINISHED? ${finished}
+    `)
+})
+
+When we run it, we got "undefined" for everything.
+
+14. To avoid such errors we create "interface" 
+- it describes object's structure
+
+index.ts:
+
+import axios from 'axios';
+
+const url = `https://jsonplaceholder.typicode.com/todos/5`;
+
+interface Todo {
+    id: number;
+    title: string;
+    completed: boolean;
+}
+
+axios.get(url).then(response => {
+    const todo = response.data as Todo;
+
+    const id = todo.ID;
+    const title = todo.Title;
+    const finished = todo.finished;
+
+    console.log(`
+        TODO ID: ${id}
+        WHAT TO DO? ${title}
+        IS IT FINISHED? ${finished}
+    `)
+})
+
+Now we immediately see the errors (messages over the errors)
+and fix them
+
+15. index.ts:
+
+...............................
+
+axios.get(url).then(response => {
+    const todo = response.data as Todo;
+
+    const id = todo.id;
+    const title = todo.title;
+    const completed = todo.completed;
+
+    console.log(`
+        TODO ID: ${id}
+        WHAT TO DO? ${title}
+        IS IT FINISHED? ${completed}
+    `)
+})
+
+16. Exchange console.log by function
+
+intex.ts:
+
+...........................................
+
+axios.get(url).then(response => {
+    const todo = response.data as Todo;
+
+    const id = todo.id;
+    const title = todo.title;
+    const finished = todo.completed;
+
+    logTodo(id, finished, title);
+
+})
+
+const logTodo = (id, title, completed) => {
+    
+    console.log(`
+        TODO ID: ${id}
+        WHAT TO DO? ${title}
+        IS IT FINISHED? ${completed}
+    `)
+
+}
+
+And we get erroneous output because of the wrong order of the arguments
+
+17. We use TS to avoid this error:
+
+const logTodo = (id: number, title: string, completed: boolean) => {
+    
+    console.log(`
+        TODO ID: ${id}
+        WHAT TO DO? ${title}
+        IS IT FINISHED? ${completed}
+    `)
+
+}
+
+18. And now we see the error before the compilation and we fix it:
+
+axios.get(url).then(response => {
+    const todo = response.data as Todo;
+
+    const id = todo.id;
+    const title = todo.title;
+    const finished = todo.completed;
+
+    logTodo(id, title, finished);
+
+})
+
+const logTodo = (id: number, title: string, completed: boolean) => {
+    
+    console.log(`
+        TODO ID: ${id}
+        WHAT TO DO? ${title}
+        IS IT FINISHED? ${completed}
+    `)
+
+}

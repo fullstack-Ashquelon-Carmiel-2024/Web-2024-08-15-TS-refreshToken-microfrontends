@@ -1,0 +1,101 @@
+1. $ npm init -y
+
+Change main file name to server.js and create the script 
+
+"start": "nodemon server.js"
+
+2. $ npm i express ws
+
+3. The part that is web server will serve the one and only html:
+
+const express = require('express')
+const webserver = express()
+ .use((req, res) =>
+   res.sendFile('/websocket-client.html', { root: __dirname })
+ )
+ .listen(3000, () => console.log(`Listening on ${3000}`))
+
+4. Now we add there the creation of websocket server:
+
+const { WebSocketServer } = require('ws')
+const sockserver = new WebSocketServer({ port: 8080 })
+
+5. After creating an instance of a WebSocket server and specifying 
+
+the port to run on, we can define any action 
+
+that should happen after the WebSocket connection is established.  
+
+In our case, we write connection events to the console and forward any messages 
+
+we receive to previously connected clients. 
+ 
+ WebSockets are designed to run on the same ports as HTTP/HTTPS (i.e., 80 and 443).
+
+sockserver.on('connection', ws => {
+ console.log('New client connected!')
+ ws.send('connection established')
+ ws.on('close', () => console.log('Client has disconnected!'))
+ ws.on('message', data => {
+   sockserver.clients.forEach(client => {
+     console.log(`distributing message: ${data}`)
+     client.send(`${data}`)
+   })
+ })
+ ws.onerror = function () {
+   console.log('websocket error')
+ }
+})
+
+6. Let's run it.
+
+$ npm start
+
+7. Let's create websocket-client.html
+
+and use the abilities of the modern browser - we create there listening websocket 
+
+just using the right address:
+
+const webSocket = new WebSocket('ws://localhost:8080/');
+
+8. event handler on incoming message:
+
+webSocket.onmessage = (event) => {
+  console.log(event)
+  document.getElementById('messages').innerHTML += 
+    'Message from server: ' + event.data + "<br>";
+};
+
+9. Form to send messages and the place to show incoming messages:
+
+<form id="input-form">
+    <label for="message">Enter Message:</label>
+    <input type="text" id="message" name="message"><br><br>
+    <input type="submit" value="Send">
+  </form>
+  <div id="messages"></div>
+
+10. The whole script looks like:
+
+ const webSocket = new WebSocket('ws://localhost:8080/');
+    webSocket.onmessage = (event) => {
+      console.log(event)
+      document.getElementById('messages').innerHTML += 
+        'Message from server: ' + event.data + "<br>";
+    };
+    webSocket.addEventListener("open", () => {
+      console.log("We are connected");
+    });
+    function sendMessage(event) {
+      var inputMessage = document.getElementById('message')
+      webSocket.send(inputMessage.value)
+      inputMessage.value = ""
+      event.preventDefault();
+    }
+    document.getElementById('input-form').addEventListener('submit', sendMessage);
+
+11. Now in the browser we get to the address localhost:3000
+
+   - open several tabs 
+
