@@ -13,10 +13,15 @@ const config = {
 const getAuthConfig = () => {
     // return authorization header with jwt token
     let accessToken = sessionStorage.getItem('olymp-user');
+    let tokenFamily = sessionStorage.getItem('olymp-token-family');
+
+    console.log(`The token ends by ${accessToken.slice(-3)}`)
+    console.log(`The token family is ${tokenFamily}`)
     
     if (accessToken) {
         return { ...config, headers: {...config.headers,
-                                         authorization: `Bearer ${accessToken}` }}
+                                         authorization: `Bearer ${accessToken}`,
+                                         tokenFamily }}
     } else {
         return config;
     };
@@ -41,11 +46,25 @@ export const getSportsmen = async (dispatchUser) => {
 
                 console.log('going to refresh access and refresh tokens')
                 
-                const result = await refresh(dispatchUser);
-                console.log(result)
-                //const result = await axios.get(`${baseAPIURL}/users`,getAuthConfig());
+                let result = await refresh(dispatchUser);
+
+                if (result.accessToken) {
+                    console.log("the second chance")
+
+                   
+
+                    const oldConfig = getAuthConfig()
+                    const newConfig = { ...oldConfig, headers: {...oldConfig.headers,
+                        authorization: `Bearer ${result.accessToken}`,
+                        tokenFamily:'?' }}
+                    
+                    
+
+                    result = await axios.get(`${baseAPIURL}/users`,newConfig);
         
-                //return result.data;
+                    return result.data;
+                }
+
                 return []
 
             } catch(err) {

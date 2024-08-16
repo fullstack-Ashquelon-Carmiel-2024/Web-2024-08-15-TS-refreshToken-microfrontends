@@ -1,7 +1,8 @@
 const User = require('../model/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const utils = require('utils');
+const {jwtDecode} = require('jwt-decode');
+const util = require('util');
 const { getResetToken } = require('./encrypt');
 const { getMailTemplateWithLink, mail } = require('./mail');
 const { updateResetToken } = require('../controller/users');
@@ -18,7 +19,7 @@ module.exports = {
             email: user.email
         }, process.env.JWT_ACCESS_SECRET,
         {
-            expiresIn: '5s'
+            expiresIn: '10s'
         }
         )
         
@@ -120,8 +121,8 @@ module.exports = {
     refresh: async function(req, res) {
         // take the refresh token from the user 
         //const cookies = req.cookies;
-        const userId = req.body.userId;
-        const refreshToken = req.body.token;
+        const email = req.body.email;
+        const refreshToken = req.body.refreshToken;
 
         // send err if there is no token or it is invalid
         if (!refreshToken) {
@@ -129,10 +130,12 @@ module.exports = {
             return res.status(401).json({auth: false, message: `You're not authenticated, no token`});
         } 
             
-        console.log(`\n********\nuserId: ${userId} \nrefreshToken: ${refreshToken}`)
+        console.log(`\n********\nemail: ${email} \nrefreshToken: ${refreshToken}`)
         
-        const user = User.findOne({ refreshToken , _id:userId })
+        const user = await User.findOne({ refreshToken , email }).populate('role','userType').exec();
         
+        console.log(`user:\n`,user)
+
         if (!user) {
             
             console.log(`\n*** NO USER ***\n`)
@@ -143,9 +146,14 @@ module.exports = {
         
         try {
 
-            const decodedUser = await utils.jwt.verify(refreshToken,process.env.JWT_REFRESH_SECRET);
+            const jwtVerify = util.promisify(jwt.verify);
+
+            const decodedUser = await jwtVerify(refreshToken,process.env.JWT_REFRESH_SECRET);
         
         } catch (err) {
+
+            console.log(err)
+            console.log(err.message)
                 
             console.log(`\n*** TOKEN NOT VERIFIED ***\n`)
             return res.status(403).json({auth: false, 
@@ -155,6 +163,7 @@ module.exports = {
 
         let newAccessToken = module.exports.generateAccessToken(user);
         let newRefreshToken = module.exports.generateRefreshToken(user);
+        console.log(`newAccessToken decoded: \n`,jwtDecode(newAccessToken))
 
         const updatedUser = await User.findByIdAndUpdate(user.id, 
             {refreshToken:newRefreshToken},{ new:true })   //tbd try-catch

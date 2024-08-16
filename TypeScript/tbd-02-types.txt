@@ -1,0 +1,192 @@
+1. TYPES
+
+Primitive Types
+
+number, string, null, void, boolean, symbol, undefined
+
+Object 
+
+functions, arrays, classes, objects
+
+2. first-type-annotation.ts:
+
+let movieTitle: string = 'Home alone';
+
+movieTitle = 'Four weddings and a funeral';
+
+movieTitle = 7;
+
+We immediately see wrong value type.
+
+3. Let's try now to write non existing method name:
+
+let movieTitle: string = 'Home alone';
+
+movieTitle = 'Four weddings and a funeral';
+
+/* movieTitle = 7; */
+
+console.log(movieTitle.toupperCase());
+
+We immediately see that we should fix it:
+
+4. first-type-annotation.ts:
+
+let movieTitle: string = 'Home alone';
+
+movieTitle = 'Four weddings and a funeral';
+
+/* movieTitle = 7; */
+
+console.log(movieTitle.toUpperCase());
+
+5. Try two more primitive data types:
+
+let movieTitle: string = 'Home alone';
+
+movieTitle = 'Four weddings and a funeral';
+
+/* movieTitle = 7; */
+
+console.log(movieTitle.toUpperCase());
+
+
+let catLives: number = 9;
+
+catLives += 2;
+
+catLives = 'eleven';
+
+
+let gameOver: boolean = false;
+
+gameOver = true;
+
+gameOver = "true";
+
+6. And fix it. first-type-annotation.ts:
+
+..................................................
+
+let catLives: number = 9;
+
+catLives += 2;
+
+/* catLives = 'eleven'; */
+
+
+let gameOver: boolean = false;
+
+gameOver = true;
+
+/* gameOver = "true"; */
+
+7. Type inference.
+
+Type annotation could be implicit too. 
+
+first-type-annotation.ts:
+
+.................................
+
+// Type inference 
+
+let tvShow = 'Seinfield';
+
+tvShow = 'The Simpsons';
+
+tvShow = true;
+
+
+let isFunny = false;
+
+isFunny = true;
+
+isFunny = "true";
+
+And again, because it is TypeScript - we see the errors immediately.
+
+Let's fix them:
+
+8. first-type-annotation.ts:
+
+................................................................
+
+// Type inference 
+
+let tvShow = 'Seinfield';
+
+tvShow = 'The Simpsons';
+
+/* tvShow = true; */
+
+
+let isFunny = false;
+
+isFunny = true;
+
+/* isFunny = "true"; */
+
+/** When TypeScript is able to guess the type of the variable-
+ * we rely on type inference - it's shorter
+ */
+
+/** When we should use explicit type annotation????
+ * 
+ * - When we declare a variable in one line and initialize it later
+ * - When we want a variable to have a type that cannot be inferred
+ * - When a function returns the 'any' type and we need to clarify it
+ * 
+ */
+
+9. Any type 
+
+first-type-annotation.ts:
+
+// ANY Type
+
+let putHereAnything: any = 123.123;
+
+putHereAnything = 'Anything, realy';
+
+putHereAnything = true;
+
+10. Implicit ANY
+
+let oWeCanPutHereAnything;
+
+// This is implicit ANY type initialization
+// We've got only a hint from TypeScript about it
+// (See the three dots? ...)
+oWeCanPutHereAnything = "Now I am a string";
+oWeCanPutHereAnything = 5;
+oWeCanPutHereAnything();
+console.log(oWeCanPutHereAnything.height)
+
+11. Delayed initialization
+
+// It is better to set some definite type,
+// even the initialization will be delayed:
+
+let stringInitializeLater: string;
+
+12. More examples:
+
+let today = new Date();
+
+/* today = today.getTime();
+time in seconds is a number */
+
+class Color {  }
+
+const red = new Color();
+
+/* red.showMe
+property showMe does not exist on class Color */
+
+const nothing: undefined = undefined;
+const totallyNothing: null = null;
+
+const now: Date = new Date();
+ 
+

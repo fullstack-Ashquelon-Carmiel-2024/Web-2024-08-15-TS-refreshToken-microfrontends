@@ -6,7 +6,7 @@ import './index.css'
 import { UserContextProvider } from "./context/userContext";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+  
     <UserContextProvider>
 
       <BrowserRouter>
@@ -14,5 +14,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       </BrowserRouter>
       
     </UserContextProvider>
-  </React.StrictMode>,
+  
 )

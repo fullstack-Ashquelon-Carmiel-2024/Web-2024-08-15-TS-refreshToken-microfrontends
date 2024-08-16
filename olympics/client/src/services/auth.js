@@ -3,6 +3,8 @@ import {jwtDecode} from 'jwt-decode';
 
 const baseAPIURL = 'http://localhost:3333/api';
 
+let isRefreshing = false;
+
 export const login = async (formData,dispatchUser) => {
 
     try {
@@ -58,13 +60,25 @@ export const resetPassword = async (formData, userId, resetToken) => {
 export const refresh = async (dispatchUser) => {
 
     let refreshToken = sessionStorage.getItem('olymp-user-refresh'); // tbd: check if we have it
-    let userId = jwtDecode(sessionStorage.getItem('olymp-user')).id;
+    let user = jwtDecode(sessionStorage.getItem('olymp-user'));
+    console.log(`user:\n`,user)
+    let email = jwtDecode(sessionStorage.getItem('olymp-user')).email;
+    console.log(`refreshToken:\n`,refreshToken)
+    console.log(`email: `,email)
 
     try {
 
         console.log(`One second, and refreshing ...`)
-        const result = await axios.post(`${baseAPIURL}/auth/refresh`,{userId, refreshToken});
-        dispatchUser({type: 'SET_REFRESHED_TOKENS',
+        const result = await axios.post(`${baseAPIURL}/auth/refresh`,{email, refreshToken});
+        
+        console.log(`AFTER REFRESHING: \n`,result.data)
+        console.log(`the last 3 chars: ${result.data.accessToken.slice(-3)}`)
+
+
+        let decodedAccessToken = jwtDecode(result.data.accessToken)
+        console.log(`decoded access token: \n`,decodedAccessToken);
+
+        await dispatchUser({type: 'SET_REFRESHED_TOKENS',
             accessToken: result.data.accessToken, 
             refreshToken: result.data.refreshToken 
         })

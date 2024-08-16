@@ -2,7 +2,7 @@ import { createContext, useReducer } from "react";
 import userReducer from "./userReducer";
 
 const INITIAL_STATE = {
-    user: {role: 'guest'}
+    user: {role: 'guest', tokenFamily: 0}
 }
 
 export const userContext = createContext(INITIAL_STATE);

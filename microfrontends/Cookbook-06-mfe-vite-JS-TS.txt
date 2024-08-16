@@ -1,0 +1,22 @@
+1. New dir mfe-01 - for working with microfrontends
+
+mfe-01
+         |
+         ------ client - this will be the main microfrontend - the host
+         |
+         ------ server
+
+2. We create the first microfrontend - it will be called remote-a
+
+$ cd mfe-01
+
+$ npx create-vite remote-a --template react
+
+$ cd remote-a 
+
+$ npm i
+
+$ npm i -D @originjs/vite-plugin-federation
+
+$ npm i react-router-dom
+
